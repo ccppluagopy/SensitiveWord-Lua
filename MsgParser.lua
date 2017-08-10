@@ -82,21 +82,22 @@ function MsgParser:init()
 end
 
 function MsgParser:getString(s)
-	local word, idx, illegals, tmps
+	if type(s) ~= 'string' then return end
 	local i = 1
 	local len = utf8Len(s)
+	local word, idx, tmps
+	
 
 	while true do
     	word = utf8Sub(s, i)
     	idx = _detect(_tree, word, i)
 
     	if idx then
-    		illegals = utf8Sub(s, i, idx)
-    		tmps = ''
-    		for j=1, utf8Len(illegals) do
+    		tmps = strSub(s, 1, i-1)
+    		for j=1, idx-i+1 do
     			tmps = tmps .. _maskWord
     		end
-    		s = strGsub(s, illegals, tmps)
+    		s = tmps .. strGsub(s, idx+1)
     		i = idx+1
     	else
     		i = i + 1
