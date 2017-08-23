@@ -2,8 +2,8 @@ local MsgParser = { inited = false }
 
 local utf8 = require("utf8")
 
-local utf8Len = utf8.len
-local utf8Sub = utf8.sub
+local strLen = utf8.len
+local strGsub = utf8.sub
 local strSub = string.sub
 local strLen = string.len
 local strByte = string.byte
@@ -34,28 +34,28 @@ local function _word2Tree(root, word)
 	end
 	
 	local tmpparent = root
-	local len = utf8Len(word)
+	local len = strLen(word)
     for i=1, len do
     	if tmpparent == true then
     		tmpparent = { isTail = true }
     	end
-    	tmpparent = _byte2Tree(tmpparent, utf8Sub(word, i, i), i==len)
+    	tmpparent = _byte2Tree(tmpparent, strSub(word, i, i), i==len)
     end
 end
 
 local function _detect(parent, word, idx)
-    local len = utf8Len(word)
+    local len = strLen(word)
   
-	local ch = utf8Sub(word, 1, 1)
+	local ch = strSub(word, 1, 1)
 	local child = parent[ch]
     
     if not child then
     elseif type(child) == 'table' then
         if len > 1 then
             if child.isTail then
-	            return _detect(child, utf8Sub(word, 2), idx+1) or idx
+	            return _detect(child, strSub(word, 2), idx+1) or idx
             else
-                return _detect(child, utf8Sub(word, 2), idx+1)
+                return _detect(child, strSub(word, 2), idx+1)
             end
         elseif len == 1 then
             if child.isTail == true then
@@ -84,12 +84,12 @@ end
 function MsgParser:getString(s)
 	if type(s) ~= 'string' then return end
 	local i = 1
-	local len = utf8Len(s)
+	local len = strLen(s)
 	local word, idx, tmps
 	
 
 	while true do
-    	word = utf8Sub(s, i)
+    	word = strSub(s, i)
     	idx = _detect(_tree, word, i)
 
     	if idx then
@@ -97,7 +97,7 @@ function MsgParser:getString(s)
     		for j=1, idx-i+1 do
     			tmps = tmps .. _maskWord
     		end
-    		s = tmps .. strGsub(s, idx+1)
+    		s = tmps .. strSub(s, idx+1)
     		i = idx+1
     	else
     		i = i + 1
